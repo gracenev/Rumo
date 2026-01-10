@@ -1,11 +1,16 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { Room } from './components/Room';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import MainMenu from './components/MainMenu'
+import Room from './components/Room';
 
 function App() {
   return (
-    <Room></Room>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainMenu />} />
+        <Route path="/room" element={<Room />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

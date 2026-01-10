@@ -1,9 +1,10 @@
 // Handles lighting and camera setup for the room scene
-import React, { useState, Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
-import { Model } from "./Model";
-import { AssetData } from "./AssetLibrary";
+import React, { useState, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
+import { Model } from './Model';
+import { AssetData } from './AssetLibrary';
+import { useNavigate } from 'react-router-dom';
 
 // Sample Layouts (Replace with dynamic data from Backend later)
 const SAMPLE_LAYOUT: AssetData[] = [
@@ -56,8 +57,10 @@ const ENERGETIC_LAYOUT: AssetData[] = [
   { asset_id: "lamp3", position: [-1, 0.5, 1], rotation: [0, 0, 0] },
 ];
 
-export function Room() {
+export default function Room() {
+  const navigate = useNavigate();
   const [layout, setLayout] = useState<AssetData[]>(SAMPLE_LAYOUT);
+    
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#1a1a1a" }}>
       <Canvas shadows camera={{ position: [4, 4, 4], fov: 50 }}>
@@ -116,19 +119,12 @@ export function Room() {
         </Suspense>
       </Canvas>
 
-      {/* HUD for Testing */}
-      <div
-        style={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          color: "white",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <h2>Room (Debug Mode)</h2>
-        <p>Assets Loaded: {layout.length}</p>
-      </div>
-    </div>
-  );
+       {/* HUD for Testing */}
+        <div style={{ position: 'absolute', top: 20, left: 20, color: 'white', fontFamily: 'sans-serif' }}>
+          <h2>Room (Debug Mode)</h2>
+          <p>Assets Loaded: {layout.length}</p>
+          <button onClick={() => navigate(-1)}>Create Another</button>
+         </div>
+       </div>
+    );
 }
