@@ -5,7 +5,8 @@ import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { Model } from './Model';
 import { AssetData } from './AssetLibrary';
 
-const INITIAL_LAYOUT: AssetData[] = [
+// Sample Layouts (Replace with dynamic data from Backend later)
+const SAMPLE_LAYOUT: AssetData[] = [
     { asset_id: 'desk', position: [0, 0, -0.75], rotation: [0, 0, 0] },
     { asset_id: 'chair', position: [0.5, 0, -0.75], rotation: [0, 3.14, 0] },
     { asset_id: 'plant', position: [1, 0, -1], rotation: [0, 0, 0] },
@@ -14,8 +15,16 @@ const INITIAL_LAYOUT: AssetData[] = [
     { asset_id: 'rug', position: [-0.5, 0, 0.5], rotation: [0, 0, 0] },
 ]
 
+const CALM_LAYOUT: AssetData[] = [
+    { asset_id: '', position: [0, 0, 0], rotation: [0, 0, 0] },
+]
+
+const ENERGETIC_LAYOUT: AssetData[] = [
+    { asset_id: '', position: [0, 0, 0], rotation: [0, 0, 0] },
+]
+
 export function Room() {
-    const [layout, setLayout] = useState<AssetData[]>(INITIAL_LAYOUT);
+    const [layout, setLayout] = useState<AssetData[]>(SAMPLE_LAYOUT);
     return (
         <div style={{ width: '100vw', height: '100vh', background: '#1a1a1a' }}>
             <Canvas shadows camera={{ position: [4, 4, 4], fov: 50 }}>
