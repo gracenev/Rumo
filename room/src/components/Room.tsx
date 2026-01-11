@@ -4,15 +4,18 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { Model } from "./Model";
 import { AssetData } from "./AssetLibrary";
-import { useNavigate } from "react-router-dom";
 
 interface RoomPreferences {
   productivityGoal: string;
   mood: string;
+  lighting: string;
 }
 
+type LayoutId = "Energetic" | "Calm" | "Sample";
+
 interface RoomProps {
-  preferences: RoomPreferences;
+  layoutId: LayoutId;
+  explanation?: string;
   onBack: () => void;
 }
 
@@ -67,28 +70,13 @@ const ENERGETIC_LAYOUT: AssetData[] = [
   { asset_id: "lamp3", position: [-1, 0.5, 1], rotation: [0, 0, 0] },
 ];
 
-export function Room({ preferences, onBack }: RoomProps) {
-  const [layout, setLayout] = useState<AssetData[]>(SAMPLE_LAYOUT);
-
-  async function askGemini() {
-    try {
-      const res = await fetch("http://127.0.0.1:8000/generate-room", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // body: JSON.stringify({ user_personality: "..." }) // if you add this
-      });
-      console.log("status:", res.status);
-
-      const data = await res.json();
-      console.log("Gemini Response:", data);
-
-      if (data.layoutId === "calm") setLayout(CALM_LAYOUT);
-      else if (data.layoutId === "energetic") setLayout(ENERGETIC_LAYOUT);
-      else setLayout(SAMPLE_LAYOUT);
-    } catch (err) {
-      console.error("Fetch failed:", err);
-    }
-  }
+export function Room({ layoutId, explanation, onBack }: RoomProps) {
+  const layout =
+    layoutId === "Calm"
+      ? CALM_LAYOUT
+      : layoutId === "Energetic"
+      ? ENERGETIC_LAYOUT
+      : SAMPLE_LAYOUT;
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#1a1a1a" }}>
@@ -160,8 +148,9 @@ export function Room({ preferences, onBack }: RoomProps) {
       >
         <h2>Room (Debug Mode)</h2>
         <p>Assets Loaded: {layout.length}</p>
-        <button onClick={askGemini}>Create Another</button>
-        <button>Go Back To Start</button>
+        <button onClick={onBack}>Go Back To Start</button>
+        <p>Selected Layout: {layoutId}</p>
+        {explanation && <p style={{ maxWidth: 360 }}>{explanation}</p>}
       </div>
     </div>
   );
