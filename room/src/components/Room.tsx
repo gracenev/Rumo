@@ -81,6 +81,26 @@ const ENERGETIC_LAYOUT: AssetData[] = [
   { asset_id: "lamp3", position: [-1, 0.5, 1], rotation: [0, 0, 0] },
 ];
 
+const getLightColor = (temp: number) => {
+  if (temp <= 50) {
+    // Warm → Neutral
+    const t = temp / 50;
+    return `rgb(
+      ${255},
+      ${Math.round(214 + (255 - 214) * t)},
+      ${Math.round(165 + (255 - 165) * t)}
+    )`;
+  } else {
+    // Neutral → Cool
+    const t = (temp - 50) / 50;
+    return `rgb(
+      ${Math.round(255 - (255 - 205) * t)},
+      ${Math.round(255 - (255 - 235) * t)},
+      ${255}
+    )`;
+  }
+};
+
 export function Room({
   preferences,
   onBack,
@@ -98,6 +118,18 @@ export function Room({
         : SAMPLE_LAYOUT;
   const [showInfo, setShowInfo] = useState(true);
   const [lightsOn, setLightsOn] = useState(true);
+  const [lightTemp, setLightTemp] = useState<number>(() => {
+    switch (preferences.lighting) {
+      case "warm":
+        return 0;
+      case "neutral":
+        return 50;
+      case "cool":
+        return 100;
+      default:
+        return 50;
+    }
+  })
 
   const LIGHT_COLOURS = {
     warm: "#FFD6A5",
@@ -279,6 +311,31 @@ export function Room({
             </button>
           </div>
 
+          {/* Lighting Temperature */}
+          <div className="space-y-3">
+            <label
+              className={`text-sm font-medium ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                }`}
+            >
+              Lighting Temperature
+            </label>
+
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={lightTemp}
+              onChange={(e) => setLightTemp(Number(e.target.value))}
+              className="w-full accent-amber-400 cursor-pointer"
+            />
+
+            <div className="flex justify-between text-xs">
+              <span className="text-amber-500">Warm</span>
+              <span className="text-gray-400">Neutral</span>
+              <span className="text-blue-400">Cool</span>
+            </div>
+          </div>
+
           {/* Shuffle Room Button */}
           <button
             onClick={shuffle}
@@ -417,7 +474,7 @@ export function Room({
                   intensity={timeOfDay === "night" ? 1.4 : 0.5}
                   distance={4}
                   decay={2}
-                  color={LIGHT_COLOURS[preferences.lighting as keyof typeof LIGHT_COLOURS]}
+                  color={getLightColor(lightTemp)}
                   castShadow
                 />
 
@@ -426,7 +483,7 @@ export function Room({
                   intensity={timeOfDay === "night" ? 1.0 : 0.35}
                   distance={3}
                   decay={2}
-                  color={LIGHT_COLOURS[preferences.lighting as keyof typeof LIGHT_COLOURS]}
+                  color={getLightColor(lightTemp)}
                 />
               </>
             )}
