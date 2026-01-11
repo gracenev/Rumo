@@ -101,6 +101,19 @@ const getLightColor = (temp: number) => {
   }
 };
 
+const lightingPreferenceToTemp = (lighting: string): number => {
+  switch (lighting.toLowerCase()) {
+    case "warm":
+      return 0;
+    case "neutral":
+      return 50;
+    case "cool":
+      return 100;
+    default:
+      return 50;
+  }
+};
+
 export function Room({
   preferences,
   onBack,
@@ -118,24 +131,9 @@ export function Room({
         : SAMPLE_LAYOUT;
   const [showInfo, setShowInfo] = useState(true);
   const [lightsOn, setLightsOn] = useState(true);
-  const [lightTemp, setLightTemp] = useState<number>(() => {
-    switch (preferences.lighting) {
-      case "warm":
-        return 0;
-      case "neutral":
-        return 50;
-      case "cool":
-        return 100;
-      default:
-        return 50;
-    }
-  })
-
-  const LIGHT_COLOURS = {
-    warm: "#FFD6A5",
-    neutral: "#FFFFFF",
-    cool: "#CDEBFF",
-  };
+  const [lightTemp, setLightTemp] = useState<number>(() =>
+    lightingPreferenceToTemp(preferences.lighting)
+  );
 
   const toggleTimeOfDay = () => {
     setTimeOfDay(timeOfDay === "day" ? "night" : "day");
@@ -148,6 +146,10 @@ export function Room({
     }, 3500); // Show info for 3.5 seconds
     return () => clearTimeout(timer);
   }, []);
+
+  // useEffect(() => {
+  //   setLightTemp(lightingPreferenceToTemp(preferences.lighting));
+  // }, [preferences.lighting]);
 
   console.log("Using layoutId:", layoutId);
   console.log("Layout data:", layout);
@@ -517,7 +519,7 @@ export function Room({
             transition-all duration-300 ease-out 
             ${showInfo
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-2 pointer-efvents-none"
+              : "opacity-0 translate-y-2 pointer-events-none"
             }`}
         >
           {explanation && <p>{explanation}</p>}
