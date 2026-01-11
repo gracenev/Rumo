@@ -43,17 +43,21 @@ const SAMPLE_LAYOUT: AssetData[] = [
 const CALM_LAYOUT: AssetData[] = [
   {
     asset_id: "desk2",
-    position: [-1, 0.2, 0.75],
+    position: [-1, 0.2, 0.25],
     rotation: [0, 3 * (Math.PI / 2), 0],
     scale: [1.4, 1.4, 1.4],
   },
   {
     asset_id: "chair2",
-    position: [-0.75, 0.3, 0.75],
+    position: [-0.75, 0.3, 0.25],
     rotation: [0, 3 * (Math.PI / 2), 0],
     scale: [0.7, 0.7, 0.7],
   },
-  { asset_id: "plant2", position: [-1, 0.5, 0], rotation: [0, Math.PI / 2, 0] },
+  {
+    asset_id: "plant2",
+    position: [-1, 0.5, 0.9],
+    rotation: [0, Math.PI / 2, 0],
+  },
   { asset_id: "bed2", position: [0.5, 0.25, -0.75], rotation: [0, 0, 0] },
   { asset_id: "lamp2", position: [-0.2, 0.5, -1], rotation: [0, 0, 0] },
   { asset_id: "rug2", position: [0.5, 0, -0.25], rotation: [0, 0, 0] },
@@ -339,7 +343,7 @@ export function Room({
               receiveShadow
             >
               <planeGeometry args={[2.5, 2.5]} />
-              <meshStandardMaterial color="#d3d1d1" />
+              <meshStandardMaterial color="#d0b17a" />
             </mesh>
 
             {/* Back Walls */}
@@ -349,7 +353,11 @@ export function Room({
               receiveShadow
             >
               <planeGeometry args={[2.5, 1.5]} />
-              <meshStandardMaterial color="#f0f0f0" />
+              {layoutId === "Energetic" ? (
+                <meshStandardMaterial color="#acc18a" />
+              ) : (
+                <meshStandardMaterial color="#ECE9D6" />
+              )}
             </mesh>
             <mesh
               rotation={[0, Math.PI / 2, 0]}
@@ -357,7 +365,11 @@ export function Room({
               receiveShadow
             >
               <planeGeometry args={[2.5, 1.5]} />
-              <meshStandardMaterial color="#f0f0f0" />
+              {layoutId === "Energetic" ? (
+                <meshStandardMaterial color="#acc18a" />
+              ) : (
+                <meshStandardMaterial color="#ECE9D6" />
+              )}
             </mesh>
 
             {/* Render the Layout Array */}
