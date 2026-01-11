@@ -4,10 +4,8 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { Model } from "./Model";
 import { AssetData } from "./AssetLibrary";
-import { Sidebar } from "./Sidebar";
 import { Button } from "./ui/button";
 import {
-  Menu,
   Sun,
   Moon,
   PanelLeft,
@@ -28,6 +26,8 @@ interface RoomProps {
   layoutId: LayoutId;
   explanation?: string;
   onBack: () => void;
+  lightsOn?: boolean;
+  onToggleLights?: () => void;
 }
 
 // Sample Layouts (Replace with dynamic data from Backend later)
@@ -86,6 +86,7 @@ export function Room({
   onBack,
   layoutId,
   explanation,
+  onToggleLights,
 }: RoomProps) {
   const [timeOfDay, setTimeOfDay] = useState<"day" | "night">("day");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -93,9 +94,16 @@ export function Room({
     layoutId === "Calm"
       ? CALM_LAYOUT
       : layoutId === "Energetic"
-      ? ENERGETIC_LAYOUT
-      : SAMPLE_LAYOUT;
+        ? ENERGETIC_LAYOUT
+        : SAMPLE_LAYOUT;
   const [showInfo, setShowInfo] = useState(true);
+  const [lightsOn, setLightsOn] = useState(true);
+
+  const LIGHT_COLOURS = {
+    warm: "#FFD6A5",
+    neutral: "#FFFFFF",
+    cool: "#CDEBFF",
+  };
 
   const toggleTimeOfDay = () => {
     setTimeOfDay(timeOfDay === "day" ? "night" : "day");
@@ -144,23 +152,19 @@ export function Room({
     <div className="relative min-h-screen w-full flex">
       {/* Sidebar */}
       <div
-        className={`border-r transition-all duration-300 flex flex-col ${
-          isSidebarOpen ? "w-80" : "w-0"
-        } ${
-          timeOfDay === "day"
+        className={`border-r transition-all duration-300 flex flex-col ${isSidebarOpen ? "w-80" : "w-0"
+          } ${timeOfDay === "day"
             ? "bg-[#E8E4DD] border-[#D4CFBF]"
             : "bg-[#252525] border-[#3A3A3A]"
-        }`}
+          }`}
       >
         <div
-          className={`flex-1 p-6 space-y-6 overflow-hidden ${
-            isSidebarOpen ? "opacity-100" : "opacity-0"
-          } transition-opacity duration-300`}
+          className={`flex-1 p-6 space-y-6 overflow-hidden ${isSidebarOpen ? "opacity-100" : "opacity-0"
+            } transition-opacity duration-300`}
         >
           <h3
-            className={`text-2xl font-medium ${
-              timeOfDay === "day" ? "text-[#2C2416]" : "text-white"
-            }`}
+            className={`text-2xl font-medium ${timeOfDay === "day" ? "text-[#2C2416]" : "text-white"
+              }`}
           >
             Customize
           </h3>
@@ -168,35 +172,32 @@ export function Room({
           {/* timeOfDay Toggle */}
           <div className="space-y-3">
             <label
-              className={`text-sm font-medium ${
-                timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
-              }`}
+              className={`text-sm font-medium ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                }`}
             >
               Theme
             </label>
             <div className="flex gap-2">
               <button
                 onClick={() => setTimeOfDay("day")}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${
-                  timeOfDay === "day"
-                    ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] text-white shadow-lg"
-                    : timeOfDay === "night"
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${timeOfDay === "day"
+                  ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] text-white shadow-lg"
+                  : timeOfDay === "night"
                     ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
                     : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
-                }`}
+                  }`}
               >
                 <Sun className="w-5 h-5" />
                 <span>Day</span>
               </button>
               <button
                 onClick={() => setTimeOfDay("night")}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${
-                  timeOfDay === "night"
-                    ? "bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] text-white shadow-lg"
-                    : timeOfDay === "day"
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${timeOfDay === "night"
+                  ? "bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] text-white shadow-lg"
+                  : timeOfDay === "day"
                     ? "bg-white/50 text-[#5B6B52] hover:bg-white/70"
                     : "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
-                }`}
+                  }`}
               >
                 <Moon className="w-5 h-5" />
                 <span>Night</span>
@@ -206,16 +207,14 @@ export function Room({
 
           {/* Room Info */}
           <div
-            className={`p-4 rounded-xl ${
-              timeOfDay === "day"
-                ? "bg-white/50 border border-[#C8D5BC]/40"
-                : "bg-black/20 border border-[#3A3A3A]/60"
-            }`}
+            className={`p-4 rounded-xl ${timeOfDay === "day"
+              ? "bg-white/50 border border-[#C8D5BC]/40"
+              : "bg-black/20 border border-[#3A3A3A]/60"
+              }`}
           >
             <h4
-              className={`text-sm font-medium mb-3 ${
-                timeOfDay === "day" ? "text-[#2C2416]" : "text-white"
-              }`}
+              className={`text-sm font-medium mb-3 ${timeOfDay === "day" ? "text-[#2C2416]" : "text-white"
+                }`}
             >
               Room Settings
             </h4>
@@ -258,35 +257,43 @@ export function Room({
           {/* Shuffle Room Button */}
           <button
             onClick={shuffle}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-              timeOfDay === "day"
-                ? "bg-white/50 text-[#5B6B52] hover:bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] hover:text-white shadow-lg"
-                : timeOfDay === "night"
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${timeOfDay === "day"
+              ? "bg-white/50 text-[#5B6B52] hover:bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] hover:text-white shadow-lg"
+              : timeOfDay === "night"
                 ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
                 : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
-            }`}
+              }`}
           >
             <Shuffle className="w-4 h-4 mr-2" />
             Shuffle Room
           </button>
         </div>
 
+        {/* Lights Toggle Button */}
+        <button
+          onClick={onToggleLights}
+          className={`px-4 py-3 rounded-xl transition ${lightsOn
+              ? "bg-gradient-to-br from-yellow-400 to-amber-500 text-white"
+              : "bg-white/40 text-gray-600"
+            }`}
+        >
+          {lightsOn ? "Lights On" : "Lights Off"}
+        </button>
+
+
         {/* Create a New Space Button at Bottom */}
         <div
-          className={`p-6 border-t ${
-            isSidebarOpen ? "opacity-100" : "opacity-0"
-          } transition-opacity duration-300 ${
-            timeOfDay === "day" ? "border-[#D4CFBF]" : "border-[#3A3A3A]"
-          }`}
+          className={`p-6 border-t ${isSidebarOpen ? "opacity-100" : "opacity-0"
+            } transition-opacity duration-300 ${timeOfDay === "day" ? "border-[#D4CFBF]" : "border-[#3A3A3A]"
+            }`}
         >
           <Button
             onClick={onBack}
             variant="ghost"
-            className={`w-full ${
-              timeOfDay === "day"
-                ? "text-[#5B6B52] hover:text-[#2C2416] hover:bg-white/50"
-                : "text-[#A8B8A0] hover:text-white hover:bg-white/10"
-            }`}
+            className={`w-full ${timeOfDay === "day"
+              ? "text-[#5B6B52] hover:text-[#2C2416] hover:bg-white/50"
+              : "text-[#A8B8A0] hover:text-white hover:bg-white/10"
+              }`}
           >
             ← Create a New Space
           </Button>
@@ -295,9 +302,8 @@ export function Room({
 
       {/* Main Canvas Area */}
       <div
-        className={`flex-1 relative transition-colors duration-500 ${
-          timeOfDay === "day" ? "bg-[#F5F5F0]" : "bg-[#1A1A1A]"
-        }`}
+        className={`flex-1 relative transition-colors duration-500 ${timeOfDay === "day" ? "bg-[#F5F5F0]" : "bg-[#1A1A1A]"
+          }`}
         style={{
           backgroundImage:
             timeOfDay === "day"
@@ -312,11 +318,10 @@ export function Room({
         <div className="absolute top-6 left-6 z-10">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={`p-3 rounded-xl transition-all duration-300 ${
-              timeOfDay === "day"
-                ? "bg-white/50 hover:bg-white/70 text-[#5B6B52] border border-[#C8D5BC]/40"
-                : "bg-black/30 hover:bg-black/50 text-[#A8B8A0] border border-[#3A3A3A]/60"
-            }`}
+            className={`p-3 rounded-xl transition-all duration-300 ${timeOfDay === "day"
+              ? "bg-white/50 hover:bg-white/70 text-[#5B6B52] border border-[#C8D5BC]/40"
+              : "bg-black/30 hover:bg-black/50 text-[#A8B8A0] border border-[#3A3A3A]/60"
+              }`}
           >
             {isSidebarOpen ? (
               <PanelLeftClose className="w-5 h-5" />
@@ -327,9 +332,18 @@ export function Room({
         </div>
 
         <Canvas shadows camera={{ position: [2.5, 2.5, 2.5], fov: 50 }}>
-          {/* Basic Lighting (Make this dynamic later) */}
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
+          {/* Natural ambient */}
+          <ambientLight
+            intensity={timeOfDay === "day" ? 0.45 : 0.1}
+          />
+
+          {/* Sun / Moon */}
+          <directionalLight
+            position={[5, 8, 5]}
+            intensity={timeOfDay === "day" ? 1.2 : 0.15}
+            color={timeOfDay === "day" ? "#ffffff" : "#9DB4FF"}
+            castShadow
+          />
 
           <Suspense fallback={null}>
             {/* The Room Floor */}
@@ -381,7 +395,7 @@ export function Room({
               opacity={0.5}
               far={1}
             />
-            <Environment preset="city" />
+            <Environment preset={timeOfDay === "day" ? "city" : "night"} />
             <OrbitControls makeDefault />
           </Suspense>
         </Canvas>
@@ -409,10 +423,9 @@ export function Room({
             text-[#2C2416] text-sm 
             p-6 shadow-xl border border-[#C8D5BC]/40 
             transition-all duration-300 ease-out 
-            ${
-              showInfo
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-2 pointer-efvents-none"
+            ${showInfo
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-2 pointer-efvents-none"
             }`}
         >
           {explanation && <p>{explanation}</p>}
