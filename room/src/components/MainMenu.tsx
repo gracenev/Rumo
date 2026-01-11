@@ -42,7 +42,7 @@ export function MainMenu({ onComplete }: MainMenuProps) {
     mood: "Calm",
     lighting: "Warm",
   });
-  const [hasAnswered, setHasAnswered] = useState<Set<number>>(new Set([0, 1]));
+  const [hasAnswered, setHasAnswered] = useState<Set<number>>(new Set([0, 1, 2]));
 
   // Progress based on current question position
   const progress = hasStarted

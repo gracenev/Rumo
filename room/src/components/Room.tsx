@@ -73,7 +73,7 @@ const ENERGETIC_LAYOUT: AssetData[] = [
   { asset_id: "lamp3", position: [-1, 0.5, 1], rotation: [0, 0, 0] },
 ];
 
-export function Room({ preferences, onBack, layoutId, explanation }: RoomProps) {
+export function Room({ onBack, layoutId, explanation }: RoomProps) {
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'evening' | 'night'>('morning');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const layout =
@@ -83,29 +83,9 @@ export function Room({ preferences, onBack, layoutId, explanation }: RoomProps) 
       ? ENERGETIC_LAYOUT
       : SAMPLE_LAYOUT;
 
-  async function askGemini() {
-    try {
-      const res = await fetch("http://127.0.0.1:8000/generate-room", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // body: JSON.stringify({ user_personality: "..." }) // if you add this
-      });
-      console.log("status:", res.status);
-
-      const data = await res.json();
-      console.log("Gemini Response:", data);
-
-      if (data.layoutId === "calm") setLayout(CALM_LAYOUT);
-      else if (data.layoutId === "energetic") setLayout(ENERGETIC_LAYOUT);
-      else setLayout(SAMPLE_LAYOUT);
-    } catch (err) {
-      console.error("Fetch failed:", err);
-    }
-  }
-
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#1a1a1a" }}>
-      <Canvas shadows camera={{ position: [4, 4, 4], fov: 50 }}>
+      <Canvas shadows camera={{ position: [2.5, 2.5, 2.5], fov: 50 }}>
         {/* Basic Lighting (Make this dynamic later) */}
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
@@ -197,7 +177,7 @@ export function Room({ preferences, onBack, layoutId, explanation }: RoomProps) 
         onClose={() => setIsSidebarOpen(false)}
         timeOfDay={timeOfDay}
         onTimeChange={setTimeOfDay}
-        onShuffle={askGemini}
+        // onShuffle={askGemini}
       />
     </div>
   );

@@ -66,7 +66,7 @@ async def generate_room(payload: IntakeRequest) -> LayoutResponse:
     
     # 3. Call Gemini
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         config={'system_instruction': system_instruction},
         contents=build_user_personality(payload.preferences)
     )

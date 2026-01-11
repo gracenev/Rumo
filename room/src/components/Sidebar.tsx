@@ -7,7 +7,7 @@ interface SidebarProps {
     onClose: () => void;
     timeOfDay: 'morning' | 'evening' | 'night';
     onTimeChange: (time: 'morning' | 'evening' | 'night') => void;
-    onShuffle: () => void;
+    // onShuffle: () => void;
 }
 
 // Theme configurations for each time of day
@@ -47,7 +47,7 @@ const themes = {
     },
 };
 
-export function Sidebar({ isOpen, onClose, timeOfDay, onTimeChange, onShuffle }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, timeOfDay, onTimeChange }: SidebarProps) {
     const theme = themes[timeOfDay];
 
     return (
@@ -101,7 +101,7 @@ export function Sidebar({ isOpen, onClose, timeOfDay, onTimeChange, onShuffle }:
                 <div className={`px-4 pt-4 border-t ${theme.border}`}>
                     <Button
                         className={`w-full ${theme.button}`}
-                        onClick={onShuffle}
+                        // onClick={onShuffle}
                     >
                         <Shuffle className="h-4 w-4 mr-2" />
                         Shuffle Room
