@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "./ui/button";
 import zenBackground from "../assets/zenBackground.jpg";
@@ -42,8 +42,18 @@ export function MainMenu({ onComplete }: MainMenuProps) {
     mood: "Calm",
     lighting: "Warm",
   });
-  const [hasAnswered, setHasAnswered] = useState<Set<number>>(new Set([0, 1, 2]));
+  const [hasAnswered, setHasAnswered] = useState<Set<number>>(
+    new Set([0, 1, 2])
+  );
 
+  const [isAppLoading, setIsAppLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAppLoading(false);
+    }, 2500); // 2.5 seconds is usually the "sweet spot" for a hackathon demo
+    return () => clearTimeout(timer);
+  }, []);
   // Progress based on current question position
   const progress = hasStarted
     ? ((currentQuestion + 1) / questions.length) * 100
@@ -87,6 +97,51 @@ export function MainMenu({ onComplete }: MainMenuProps) {
       {/* Left Side - Questions Panel (2/3 width) */}
       <div className="relative w-full lg:w-2/3 min-h-screen bg-gradient-to-br from-[#E8E4DD] via-[#DFE5D8] to-[#E8E4DD] flex flex-col">
         {/* Progress Bar - Only show when started */}
+        <AnimatePresence>
+          {isAppLoading && (
+            <motion.div
+              key="preloader"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#E8E4DD]"
+            >
+              {/* A calming, pulsing logo or icon */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 2.5,
+                  ease: "easeInOut",
+                }}
+                className="mb-8"
+              >
+                <h2 className="text-3xl font-light tracking-[0.2em] text-[#5B6B52]">
+                  RUMO
+                </h2>
+              </motion.div>
+
+              <div className="w-32 h-[1px] bg-[#D4CFBF] overflow-hidden">
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: "linear",
+                  }}
+                  className="w-full h-full bg-[#6B8E5F]"
+                />
+              </div>
+              <p className="mt-4 text-xs tracking-widest text-[#5B6B52]/60 uppercase">
+                Finding your balance
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {hasStarted && (
           <div className="relative z-10 pt-8 px-6 md:px-12">
             <div className="max-w-2xl mx-auto">

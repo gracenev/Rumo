@@ -136,7 +136,7 @@ Rules:
 - rotation[y] must be one of: 0, 1.57079632679, 3.14159265359, 4.71238898038
 - If an item has "scale", keep scale EXACTLY the same as input.
 - Keep items at least 0.25 units apart (approx).
-- keep the chair and desk assets near each other in every arrangement and must have the same rotation[y] output value.
+- keep the chair and desk assets near each other in every arrangement and can not have the same rotation[y] output value.
 
 Input arrange JSON:
 {arrange_json}
