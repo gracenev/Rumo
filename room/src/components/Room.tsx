@@ -5,14 +5,33 @@ import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { Model } from "./Model";
 import { AssetData } from "./AssetLibrary";
 import { Button } from "./ui/button";
-import {
-  Sun,
-  Moon,
-  PanelLeft,
-  PanelLeftClose,
-  Shuffle,
-} from "lucide-react";
+import { Sun, Moon, PanelLeft, PanelLeftClose, Shuffle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
+const loaderOverlayStyles: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent white
+  backdropFilter: "blur(10px)", // The "Glass" effect
+  zIndex: 9999,
+  color: "#5B6B52",
+  fontFamily: "sans-serif",
+};
 
+const loadingMessages = [
+  "Deep breaths...",
+  "Arranging your furniture...",
+  "Optimizing for peace...",
+  "Calibrating the light...",
+  "Finalizing your sanctuary...",
+];
 interface RoomPreferences {
   productivityGoal: string;
   mood: string;
@@ -131,9 +150,19 @@ export function Room({
     layoutId === "Calm"
       ? CALM_LAYOUT
       : layoutId === "Energetic"
-        ? ENERGETIC_LAYOUT
-        : SAMPLE_LAYOUT;
+      ? ENERGETIC_LAYOUT
+      : SAMPLE_LAYOUT;
+
   const [showInfo, setShowInfo] = useState(true);
+  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [shuffleLoading, setShuffleLoading] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAppLoading(false);
+    }, 2500); // Simulate a 4-second loading time
+    return () => clearTimeout(timer);
+  }, []);
   const [lightsOn, setLightsOn] = useState(true);
   const [lightTemp, setLightTemp] = useState<number>(() =>
     lightingPreferenceToTemp(preferences.lighting)
@@ -151,10 +180,6 @@ export function Room({
     return () => clearTimeout(timer);
   }, []);
 
-  // useEffect(() => {
-  //   setLightTemp(lightingPreferenceToTemp(preferences.lighting));
-  // }, [preferences.lighting]);
-
   console.log("Using layoutId:", layoutId);
   console.log("Layout data:", layout);
 
@@ -168,6 +193,7 @@ export function Room({
   console.log("Current arrangement:", arrange);
 
   const shuffle = async () => {
+    setShuffleLoading(true); // 1. Start the "pretty" loader
     try {
       const res = await fetch("http://localhost:8000/shuffle-arrangement", {
         method: "POST",
@@ -183,11 +209,103 @@ export function Room({
       console.log("Updated arrangement state:", data.arrange);
     } catch (error) {
       console.error("Error fetching shuffled arrangement:", error);
+    } finally {
+      setShuffleLoading(false); // 4. Stop the loader
     }
   };
 
   return (
     <div className="relative min-h-screen w-full flex">
+      <AnimatePresence>
+        {isAppLoading && (
+          <motion.div
+            key="preloader"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#E8E4DD]"
+          >
+            {/* A calming, pulsing logo or icon */}
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 2.5,
+                ease: "easeInOut",
+              }}
+              className="mb-8"
+            >
+              <h2 className="text-3xl font-light tracking-[0.2em] text-[#5B6B52]">
+                RUMO
+              </h2>
+            </motion.div>
+
+            <div className="w-32 h-[1px] bg-[#D4CFBF] overflow-hidden">
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: "linear",
+                }}
+                className="w-full h-full bg-[#6B8E5F]"
+              />
+            </div>
+            <p className="mt-4 text-xs tracking-widest text-[#5B6B52]/60 uppercase">
+              Finding your balance
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {shuffleLoading && (
+          <motion.div
+            key="preloader"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#E8E4DD]"
+          >
+            {/* A calming, pulsing logo or icon */}
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 2.5,
+                ease: "easeInOut",
+              }}
+              className="mb-8"
+            >
+              <h2 className="text-3xl font-light tracking-[0.2em] text-[#5B6B52]">
+                RUMO
+              </h2>
+            </motion.div>
+
+            <div className="w-32 h-[1px] bg-[#D4CFBF] overflow-hidden">
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  ease: "linear",
+                }}
+                className="w-full h-full bg-[#6B8E5F]"
+              />
+            </div>
+            <p className="mt-4 text-xs tracking-widest text-[#5B6B52]/60 uppercase">
+              Finding your balance
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Sidebar */}
       <div
         className={`border-r transition-all duration-300 flex flex-col ${isSidebarOpen ? "w-80" : "w-0"
@@ -219,10 +337,10 @@ export function Room({
               <button
                 onClick={() => setTimeOfDay("day")}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${timeOfDay === "day"
-                  ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] text-white shadow-lg"
-                  : timeOfDay === "night"
-                    ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
-                    : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
+                    ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] text-white shadow-lg"
+                    : timeOfDay === "night"
+                      ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
+                      : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
                   }`}
               >
                 <Sun className="w-5 h-5" />
@@ -231,10 +349,10 @@ export function Room({
               <button
                 onClick={() => setTimeOfDay("night")}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${timeOfDay === "night"
-                  ? "bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] text-white shadow-lg"
-                  : timeOfDay === "day"
-                    ? "bg-white/50 text-[#5B6B52] hover:bg-white/70"
-                    : "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
+                    ? "bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] text-white shadow-lg"
+                    : timeOfDay === "day"
+                      ? "bg-white/50 text-[#5B6B52] hover:bg-white/70"
+                      : "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
                   }`}
               >
                 <Moon className="w-5 h-5" />
@@ -246,8 +364,8 @@ export function Room({
           {/* Room Info */}
           <div
             className={`p-4 rounded-xl ${timeOfDay === "day"
-              ? "bg-white/50 border border-[#C8D5BC]/40"
-              : "bg-black/20 border border-[#3A3A3A]/60"
+                ? "bg-white/50 border border-[#C8D5BC]/40"
+                : "bg-black/20 border border-[#3A3A3A]/60"
               }`}
           >
             <h4
@@ -260,7 +378,7 @@ export function Room({
               <div className="flex justify-between">
                 <span
                   className={
-                    timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                    timeOfDay === "day" ? "text-[#5B6B52] font-medium" : "text-[#A8B8A0] font-medium"
                   }
                 >
                   Goal:
@@ -276,7 +394,7 @@ export function Room({
               <div className="flex justify-between">
                 <span
                   className={
-                    timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                    timeOfDay === "day" ? "text-[#5B6B52] font-medium" : "text-[#A8B8A0] font-medium"
                   }
                 >
                   Mood:
@@ -292,53 +410,66 @@ export function Room({
             </div>
           </div>
 
-          {/* Lights Toggle Switch */}
-          <div className="flex items-center justify-between px-4 py-3 rounded-xl">
-            <span
-              className={`text-sm font-medium transition ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+          <div
+            className={`p-4 rounded-xl ${timeOfDay === "day"
+                ? "bg-white/50 border border-[#C8D5BC]/40"
+                : "bg-black/20 border border-[#3A3A3A]/60"
+              }`}
+          >
+            <h4
+              className={`text-sm font-medium mb-3 ${timeOfDay === "day" ? "text-[#2C2416]" : "text-white"
                 }`}
             >
-              Lights
-            </span>
-
-            <button
-              onClick={() => setLightsOn(prev => !prev)}
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300
-      ${lightsOn
-                  ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878]"
-                  : "bg-gray-400/50"
-                }`}
-            >
+              Light Settings
+            </h4>
+            {/* Lights Toggle Switch */}
+            <div className="flex items-center justify-between py-3 rounded-xl">
               <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white
+                className={`text-sm font-medium transition ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                  }`}
+              >
+                Lights
+              </span>
+
+              <button
+                onClick={() => setLightsOn((prev) => !prev)}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300
+      ${lightsOn
+                    ? "bg-gradient-to-br from-[#6B8E5F] to-[#8BA878]"
+                    : "bg-gray-400/50"
+                  }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white
         transition-transform duration-300
         ${lightsOn ? "translate-x-6" : "translate-x-0"}`}
+                />
+              </button>
+            </div>
+
+            {/* Lighting Temperature */}
+            <div className="space-y-3">
+              <label
+                className={`text-sm font-medium ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
+                  }`}
+              >
+                Lighting Temperature
+              </label>
+
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={lightTemp}
+                onChange={(e) => setLightTemp(Number(e.target.value))}
+                className="w-full accent-amber-400 cursor-pointer"
               />
-            </button>
-          </div>
 
-          {/* Lighting Temperature */}
-          <div className="space-y-3">
-            <label
-              className={`text-sm font-medium ${timeOfDay === "day" ? "text-[#5B6B52]" : "text-[#A8B8A0]"
-                }`}
-            >
-              Lighting Temperature
-            </label>
-
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={lightTemp}
-              onChange={(e) => setLightTemp(Number(e.target.value))}
-              className="w-full accent-amber-400 cursor-pointer"
-            />
-
-            <div className="flex justify-between text-xs">
-              <span className="text-amber-500">Warm</span>
-              <span className="text-gray-400">Neutral</span>
-              <span className="text-blue-400">Cool</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-amber-500">Warm</span>
+                <span className="text-gray-400">Neutral</span>
+                <span className="text-blue-400">Cool</span>
+              </div>
             </div>
           </div>
 
@@ -346,10 +477,10 @@ export function Room({
           <button
             onClick={shuffle}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${timeOfDay === "day"
-              ? "bg-white/50 text-[#5B6B52] hover:bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] hover:text-white shadow-lg"
-              : timeOfDay === "night"
-                ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
-                : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
+                ? "bg-white/50 text-[#5B6B52] hover:bg-gradient-to-br from-[#6B8E5F] to-[#8BA878] hover:text-white shadow-lg"
+                : timeOfDay === "night"
+                  ? "bg-[#1A1A1A] text-[#A8B8A0] hover:bg-[#2A2A2A]"
+                  : "bg-white/50 text-[#5B6B52] hover:bg-white/70"
               }`}
           >
             <Shuffle className="w-4 h-4 mr-2" />
@@ -367,8 +498,8 @@ export function Room({
             onClick={onBack}
             variant="ghost"
             className={`w-full ${timeOfDay === "day"
-              ? "text-[#5B6B52] hover:text-[#2C2416] hover:bg-white/50"
-              : "text-[#A8B8A0] hover:text-white hover:bg-white/10"
+                ? "text-[#5B6B52] hover:text-[#2C2416] hover:bg-white/50"
+                : "text-[#A8B8A0] hover:text-white hover:bg-white/10"
               }`}
           >
             ← Create a New Space
@@ -395,8 +526,8 @@ export function Room({
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className={`p-3 rounded-xl transition-all duration-300 ${timeOfDay === "day"
-              ? "bg-white/50 hover:bg-white/70 text-[#5B6B52] border border-[#C8D5BC]/40"
-              : "bg-black/30 hover:bg-black/50 text-[#A8B8A0] border border-[#3A3A3A]/60"
+                ? "bg-white/50 hover:bg-white/70 text-[#5B6B52] border border-[#C8D5BC]/40"
+                : "bg-black/30 hover:bg-black/50 text-[#A8B8A0] border border-[#3A3A3A]/60"
               }`}
           >
             {isSidebarOpen ? (
@@ -409,9 +540,7 @@ export function Room({
 
         <Canvas shadows camera={{ position: [2.5, 2.5, 2.5], fov: 50 }}>
           {/* Natural ambient */}
-          <ambientLight
-            intensity={timeOfDay === "day" ? 0.45 : 0.1}
-          />
+          <ambientLight intensity={timeOfDay === "day" ? 0.45 : 0.1} />
 
           {/* Sun / Moon */}
           <directionalLight
