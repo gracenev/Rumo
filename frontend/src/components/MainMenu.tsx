@@ -43,7 +43,7 @@ export function MainMenu({ onComplete }: MainMenuProps) {
     lighting: "Warm",
   });
   const [hasAnswered, setHasAnswered] = useState<Set<number>>(
-    new Set([0, 1, 2])
+    new Set([0, 1, 2]),
   );
 
   const [isAppLoading, setIsAppLoading] = useState(true);
@@ -84,13 +84,6 @@ export function MainMenu({ onComplete }: MainMenuProps) {
 
   const isLastQuestion = currentQuestion === questions.length - 1;
   const canProceed = hasAnswered.has(currentQuestion);
-
-  const createRoom = () => {
-    // Here you would normally send the goal and mood to your backend
-    // and get back a room configuration. For now, we just navigate
-    // to the Room component.
-    // navigate('/room', { state: { goal, mood } });
-  };
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex">
